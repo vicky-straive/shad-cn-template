@@ -34,3 +34,5 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+Setup all the basic requiremtnets for the projects, authentication, git initializations, git ingnore files, security protocols, .evn files, middleware, API engines and recoil but do not setup DB. This will be a project template where i will be using them for various projects. So do all the neceassry changes to it
