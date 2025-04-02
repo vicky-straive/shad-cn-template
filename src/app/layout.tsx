@@ -5,8 +5,6 @@ import RecoilRoot from "@/app/services/recoil/recoil-provider";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AuthProvider } from "../../auth-provider";
 import { Toaster } from "@/components/ui/sonner";
-import { ThemePicker } from "@/components/theme-picker";
-import { ThemeApplier } from "@/components/theme-applier";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -22,9 +20,6 @@ export default function RootLayout({
         <RecoilRoot>
           <AuthProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-              <header className="fixed top-0 right-0 p-4 z-50">
-                <ThemePicker />
-              </header>
               {children}
               <Toaster />
             </ThemeProvider>

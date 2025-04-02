@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import {
   IconCreditCard,
@@ -6,13 +6,14 @@ import {
   IconLogout,
   IconNotification,
   IconUserCircle,
-} from "@tabler/icons-react"
+  IconSun,
+  IconMoon,
+  IconDeviceDesktop,
+  IconLetterA,
+  IconPalette,
+} from "@tabler/icons-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,24 +22,35 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+  DropdownMenuSub,
+  DropdownMenuSubTrigger,
+  DropdownMenuSubContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+} from "@/components/ui/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar"
+} from "@/components/ui/sidebar";
+import { useTheme } from "next-themes";
+import { useThemeSettings } from "@/hooks/use-theme-settings";
+import { FONT_OPTIONS, FONT_SIZE_OPTIONS } from "@/lib/fonts";
+import { THEMES } from "@/lib/themes";
 
 export function NavUser({
   user,
 }: {
   user: {
-    name: string
-    email: string
-    avatar: string
-  }
+    name: string;
+    email: string;
+    avatar: string;
+  };
 }) {
-  const { isMobile } = useSidebar()
+  const { isMobile } = useSidebar();
+  const { theme, setTheme } = useTheme();
+  const { themeSettings, setThemeSettings } = useThemeSettings();
 
   return (
     <SidebarMenu>
@@ -97,6 +109,91 @@ export function NavUser({
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
+
+            <DropdownMenuSeparator />
+            {/* Theme Settings Section */}
+            <DropdownMenuSeparator />
+            <DropdownMenuGroup>
+              {/* Theme Mode Selection */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <IconPalette className="mr-2 size-4" />
+                  Theme
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuRadioGroup
+                    value={themeSettings.theme}
+                    onValueChange={(value) => {
+                      setThemeSettings({ theme: value });
+                      setTheme(value);
+                    }}
+                  >
+                    <DropdownMenuRadioItem value="light">
+                      <IconSun className="mr-2 size-4" />
+                      Light
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="dark">
+                      <IconMoon className="mr-2 size-4" />
+                      Dark
+                    </DropdownMenuRadioItem>
+                    <DropdownMenuRadioItem value="system">
+                      <IconDeviceDesktop className="mr-2 size-4" />
+                      System
+                    </DropdownMenuRadioItem>
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              {/* Font Family Selection */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <IconLetterA className="mr-2 size-4" />
+                  Font
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuRadioGroup
+                    value={themeSettings.font}
+                    onValueChange={(value) => setThemeSettings({ font: value })}
+                  >
+                    {FONT_OPTIONS.map((font) => (
+                      <DropdownMenuRadioItem
+                        key={font.value}
+                        value={font.value}
+                        className={font.className}
+                      >
+                        {font.name}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+
+              {/* Font Size Selection */}
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>
+                  <IconLetterA className="mr-2 size-4" />
+                  Font Size
+                </DropdownMenuSubTrigger>
+                <DropdownMenuSubContent>
+                  <DropdownMenuRadioGroup
+                    value={themeSettings.fontSize.toString()}
+                    onValueChange={(value) =>
+                      setThemeSettings({ fontSize: parseInt(value) })
+                    }
+                  >
+                    {FONT_SIZE_OPTIONS.map((size) => (
+                      <DropdownMenuRadioItem
+                        key={size.value}
+                        value={size.value.toString()}
+                      >
+                        {size.name}
+                      </DropdownMenuRadioItem>
+                    ))}
+                  </DropdownMenuRadioGroup>
+                </DropdownMenuSubContent>
+              </DropdownMenuSub>
+            </DropdownMenuGroup>
+
             <DropdownMenuSeparator />
             <DropdownMenuItem>
               <IconLogout />
@@ -106,5 +203,5 @@ export function NavUser({
         </DropdownMenu>
       </SidebarMenuItem>
     </SidebarMenu>
-  )
+  );
 }
