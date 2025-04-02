@@ -4,7 +4,7 @@ import { useState } from "react";
 import { THEMES } from "@/lib/themes";
 import { FONT_OPTIONS, FONT_SIZE_OPTIONS } from "@/lib/fonts";
 import { useThemeSettings } from "@/hooks/use-theme-settings";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile as useMobile } from "@/hooks/use-mobile";
 import {
   Popover,
   PopoverContent,
@@ -23,9 +23,16 @@ import { Slider } from "@/components/ui/slider";
 import { Paintbrush, Type, TextCursorInput } from "lucide-react";
 
 export function ThemePicker() {
-  const { theme, font, fontSize, setTheme, setFont, setFontSize } =
-    useThemeSettings();
-  const isMobile = useIsMobile();
+  const { themeSettings, setThemeSettings } = useThemeSettings();
+  const { theme, font, fontSize } = themeSettings;
+
+  const setTheme = (newTheme: string) =>
+    setThemeSettings((prev) => ({ ...prev, theme: newTheme }));
+  const setFont = (newFont: string) =>
+    setThemeSettings((prev) => ({ ...prev, font: newFont }));
+  const setFontSize = (newFontSize: number) =>
+    setThemeSettings((prev) => ({ ...prev, fontSize: newFontSize }));
+  const isMobile = useMobile();
   const [open, setOpen] = useState(false);
 
   return (

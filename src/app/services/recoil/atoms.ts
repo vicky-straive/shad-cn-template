@@ -43,11 +43,17 @@ const { persistAtom } = recoilPersist({
 });
 
 // Theme settings atom with persistence
-export const themeSettingsState = atom<ThemeSettings>({
-  key: "themeSettingsState",
+export type ThemePreference = {
+  theme: string;
+  font: string;
+  fontSize: number;
+};
+
+export const themePreferenceState = atom<ThemePreference>({
+  key: "themePreferenceState",
   default: {
-    theme: "default",
-    font: "sans",
+    theme: "system",
+    font: "geist",
     fontSize: 16,
   },
   effects_UNSTABLE: [persistAtom],

@@ -1,72 +1,62 @@
 "use client";
 
-import { useEffect } from "react";
-import { atom, useRecoilState } from "recoil";
-import { recoilPersist } from "recoil-persist";
-
-// Setup recoil-persist
-const { persistAtom } = recoilPersist({
-  key: "theme-settings",
-  storage: typeof window === "undefined" ? undefined : window.localStorage,
-});
-
-// Theme settings interface
-export interface ThemeSettings {
-  theme: string;
-  font: string;
-  fontSize: number;
-}
-
-// Theme settings atom with persistence
-export const themeSettingsState = atom<ThemeSettings>({
-  key: "themeSettingsState",
-  default: {
-    theme: "default",
-    font: "sans",
-    fontSize: 16,
-  },
-  effects_UNSTABLE: [persistAtom],
-});
+import { useState, useEffect } from "react";
+import { themePreferenceState, ThemePreference } from "./../../theme.store";
 
 export function useThemeSettings() {
-  const [themeSettings, setThemeSettings] = useRecoilState(themeSettingsState);
-
-  const setTheme = (theme: string) => {
-    setThemeSettings((prev) => ({ ...prev, theme }));
+  // Default theme settings
+  const defaultSettings: ThemePreference = {
+    theme: "system",
+    font: "geist",
+    fontSize: 16,
   };
 
-  const setFont = (font: string) => {
-    setThemeSettings((prev) => ({ ...prev, font }));
-  };
+  // State for tracking if component is mounted
+  const [mounted, setMounted] = useState(false);
 
-  const setFontSize = (fontSize: number) => {
-    setThemeSettings((prev) => ({ ...prev, fontSize }));
-  };
+  // Local state for theme settings
+  const [themeSettings, setThemeSettings] =
+    useState<ThemePreference>(defaultSettings);
 
-  // Apply theme to document
+  // Effect to handle Recoil state after mounting
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      // Remove all theme classes
-      document.documentElement.classList.forEach((className) => {
-        if (className.startsWith("theme-")) {
-          document.documentElement.classList.remove(className);
+    // Mark component as mounted
+    setMounted(true);
+
+    try {
+      // Try to get stored settings from localStorage
+      const storedSettings = localStorage.getItem("theme-preferences");
+      if (storedSettings) {
+        const parsedSettings = JSON.parse(storedSettings);
+        if (parsedSettings.themePreferenceState) {
+          setThemeSettings(parsedSettings.themePreferenceState);
         }
-      });
-
-      // Add current theme class
-      document.documentElement.classList.add(`theme-${themeSettings.theme}`);
-
-      // Set font size on root element
-      document.documentElement.style.fontSize = `${themeSettings.fontSize}px`;
+      }
+    } catch (error) {
+      console.error("Error reading theme settings from localStorage:", error);
     }
-  }, [themeSettings.theme, themeSettings.fontSize]);
+  }, []);
+
+  // Function to update theme settings
+  const updateThemeSettings = (newSettings: Partial<ThemePreference>) => {
+    const updatedSettings = { ...themeSettings, ...newSettings };
+    setThemeSettings(updatedSettings);
+
+    // Save to localStorage if component is mounted
+    if (mounted) {
+      try {
+        localStorage.setItem(
+          "theme-preferences",
+          JSON.stringify({ themePreferenceState: updatedSettings })
+        );
+      } catch (error) {
+        console.error("Error saving theme settings to localStorage:", error);
+      }
+    }
+  };
 
   return {
-    theme: themeSettings.theme,
-    font: themeSettings.font,
-    fontSize: themeSettings.fontSize,
-    setTheme,
-    setFont,
-    setFontSize,
+    themeSettings,
+    setThemeSettings: updateThemeSettings,
   };
 }
