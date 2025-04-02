@@ -1,186 +1,102 @@
 "use client";
 
-import { useState } from "react";
-import { THEMES } from "@/lib/themes";
-import { FONT_OPTIONS, FONT_SIZE_OPTIONS } from "@/lib/fonts";
 import { useThemeSettings } from "@/hooks/use-theme-settings";
-import { useIsMobile as useMobile } from "@/hooks/use-mobile";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
-import { Slider } from "@/components/ui/slider";
-import { Paintbrush, Type, TextCursorInput } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Moon, Sun, Laptop, Type } from "lucide-react"; // Import icons
 
 export function ThemePicker() {
   const { themeSettings, setThemeSettings } = useThemeSettings();
-  const { theme, font, fontSize } = themeSettings;
+  const { setTheme } = useTheme(); // Use next-themes for theme switching
 
-  // / Update these functions:
-  const setTheme = (newTheme: string) => setThemeSettings({ theme: newTheme });
+  // Update both our state and next-themes
+  const handleThemeChange = (newTheme: string) => {
+    setThemeSettings({ theme: newTheme });
+    setTheme(newTheme); // This ensures next-themes also updates
+  };
 
-  const setFont = (newFont: string) => setThemeSettings({ font: newFont });
+  const fontOptions = [
+    { name: "Geist", value: "geist" },
+    { name: "Inter", value: "inter" },
+    { name: "Noto Mono", value: "noto-mono" },
+  ];
 
-  const setFontSize = (newFontSize: number) =>
-    setThemeSettings({ fontSize: newFontSize });
-  const isMobile = useMobile();
-  const [open, setOpen] = useState(false);
+  const fontSizeOptions = [14, 16, 18, 20];
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button variant="outline" size="icon" className="h-9 w-9">
-          <Paintbrush className="h-4 w-4" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className={isMobile ? "w-screen" : "w-80"} align="end">
-        <Tabs defaultValue="theme">
-          <TabsList className="grid grid-cols-3">
-            <TabsTrigger value="theme">
-              <Paintbrush className="h-4 w-4 mr-2" />
-              Theme
-            </TabsTrigger>
-            <TabsTrigger value="font">
-              <Type className="h-4 w-4 mr-2" />
-              Font
-            </TabsTrigger>
-            <TabsTrigger value="size">
-              <TextCursorInput className="h-4 w-4 mr-2" />
-              Size
-            </TabsTrigger>
-          </TabsList>
+    <div className="flex gap-2">
+      {/* Theme Dropdown */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="icon">
+            {themeSettings.theme === "dark" ? (
+              <Moon className="h-4 w-4" />
+            ) : themeSettings.theme === "light" ? (
+              <Sun className="h-4 w-4" />
+            ) : (
+              <Laptop className="h-4 w-4" />
+            )}
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => handleThemeChange("light")}>
+            <Sun className="mr-2 h-4 w-4" />
+            <span>Light</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleThemeChange("dark")}>
+            <Moon className="mr-2 h-4 w-4" />
+            <span>Dark</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={() => handleThemeChange("system")}>
+            <Laptop className="mr-2 h-4 w-4" />
+            <span>System</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-          <TabsContent value="theme" className="space-y-4 py-2">
-            <div className="space-y-2">
-              <h4 className="font-medium text-sm">Select Theme</h4>
-              <Select value={theme} onValueChange={setTheme}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a theme" />
-                </SelectTrigger>
-                <SelectContent>
-                  {THEMES.map((themeOption) => (
-                    <SelectItem
-                      key={themeOption.value}
-                      value={themeOption.value}
-                    >
-                      {themeOption.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2">
-              {THEMES.map((themeOption) => (
-                <Button
-                  key={themeOption.value}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setTheme(themeOption.value)}
-                  className={`justify-start ${
-                    themeOption.value === theme ? "border-2 border-primary" : ""
-                  }`}
-                >
-                  <div
-                    className={`mr-1 h-4 w-4 rounded-full bg-${themeOption.value}`}
-                  />
-                  <span className="text-xs">{themeOption.name}</span>
-                </Button>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="font" className="space-y-4 py-2">
-            <div className="space-y-2">
-              <h4 className="font-medium text-sm">Select Font</h4>
-              <Select value={font} onValueChange={setFont}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a font" />
-                </SelectTrigger>
-                <SelectContent>
-                  {FONT_OPTIONS.map((fontOption) => (
-                    <SelectItem
-                      key={fontOption.value}
-                      value={fontOption.value}
-                      className={fontOption.className}
-                    >
-                      {fontOption.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2">
-              {FONT_OPTIONS.map((fontOption) => (
-                <Button
-                  key={fontOption.value}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setFont(fontOption.value)}
-                  className={`justify-start ${fontOption.className} ${
-                    fontOption.value === font ? "border-2 border-primary" : ""
-                  }`}
-                >
-                  {fontOption.name}
-                </Button>
-              ))}
-            </div>
-          </TabsContent>
-
-          <TabsContent value="size" className="space-y-4 py-2">
-            <div className="space-y-2">
-              <div className="flex justify-between">
-                <h4 className="font-medium text-sm">Font Size</h4>
-                <span className="text-sm">{fontSize}px</span>
-              </div>
-              <Slider
-                value={[fontSize]}
-                min={12}
-                max={28}
-                step={1}
-                onValueChange={(value) => setFontSize(value[0])}
-              />
-            </div>
-
-            <div className="grid grid-cols-3 gap-2">
-              {FONT_SIZE_OPTIONS.map((sizeOption) => (
-                <Button
-                  key={sizeOption.value}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setFontSize(sizeOption.value)}
-                  className={`${
-                    sizeOption.value === fontSize
-                      ? "border-2 border-primary"
-                      : ""
-                  }`}
-                >
-                  {sizeOption.name}
-                </Button>
-              ))}
-            </div>
-
-            <div
-              className="rounded border p-3 text-sm"
-              style={{ fontSize: `${fontSize}px` }}
+      {/* Font Dropdown */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="outline" size="icon">
+            <Type className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          {fontOptions.map((font) => (
+            <DropdownMenuItem
+              key={font.value}
+              onClick={() => setThemeSettings({ font: font.value })}
             >
-              Sample text with the current font size.
+              {font.name}
+            </DropdownMenuItem>
+          ))}
+          <DropdownMenuItem>
+            <div className="flex flex-col w-full">
+              <span className="mb-2">Font Size</span>
+              <div className="flex gap-2">
+                {fontSizeOptions.map((size) => (
+                  <Button
+                    key={size}
+                    variant={
+                      themeSettings.fontSize === size ? "default" : "outline"
+                    }
+                    size="sm"
+                    onClick={() => setThemeSettings({ fontSize: size })}
+                  >
+                    {size}
+                  </Button>
+                ))}
+              </div>
             </div>
-          </TabsContent>
-        </Tabs>
-      </PopoverContent>
-    </Popover>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   );
 }

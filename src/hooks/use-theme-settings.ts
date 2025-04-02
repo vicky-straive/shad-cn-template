@@ -1,62 +1,52 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { themePreferenceState, ThemePreference } from "./../../theme.store";
+import { ThemePreference } from "./../../theme.store";
 
 export function useThemeSettings() {
-  // Default theme settings
+  // Default settings
   const defaultSettings: ThemePreference = {
     theme: "system",
     font: "geist",
     fontSize: 16,
   };
 
-  // State for tracking if component is mounted
+  // State for theme settings
+  const [themeSettings, setThemeSettingsState] =
+    useState<ThemePreference>(defaultSettings);
   const [mounted, setMounted] = useState(false);
 
-  // Local state for theme settings
-  const [themeSettings, setThemeSettings] =
-    useState<ThemePreference>(defaultSettings);
-
-  // Effect to handle Recoil state after mounting
+  // Load settings from localStorage on mount
   useEffect(() => {
-    // Mark component as mounted
     setMounted(true);
-
     try {
-      // Try to get stored settings from localStorage
-      const storedSettings = localStorage.getItem("theme-preferences");
+      const storedSettings = localStorage.getItem("theme-settings");
       if (storedSettings) {
-        const parsedSettings = JSON.parse(storedSettings);
-        if (parsedSettings.themePreferenceState) {
-          setThemeSettings(parsedSettings.themePreferenceState);
-        }
+        setThemeSettingsState(JSON.parse(storedSettings));
       }
     } catch (error) {
-      console.error("Error reading theme settings from localStorage:", error);
+      console.error("Failed to load theme settings:", error);
     }
   }, []);
 
-  // Function to update theme settings
-  const updateThemeSettings = (newSettings: Partial<ThemePreference>) => {
-    const updatedSettings = { ...themeSettings, ...newSettings };
-    setThemeSettings(updatedSettings);
-
-    // Save to localStorage if component is mounted
-    if (mounted) {
-      try {
-        localStorage.setItem(
-          "theme-preferences",
-          JSON.stringify({ themePreferenceState: updatedSettings })
-        );
-      } catch (error) {
-        console.error("Error saving theme settings to localStorage:", error);
+  // Function to update settings
+  const setThemeSettings = (newSettings: Partial<ThemePreference>) => {
+    setThemeSettingsState((prev) => {
+      const updated = { ...prev, ...newSettings };
+      // Save to localStorage
+      if (mounted) {
+        try {
+          localStorage.setItem("theme-settings", JSON.stringify(updated));
+        } catch (error) {
+          console.error("Failed to save theme settings:", error);
+        }
       }
-    }
+      return updated;
+    });
   };
 
   return {
     themeSettings,
-    setThemeSettings: updateThemeSettings,
+    setThemeSettings,
   };
 }

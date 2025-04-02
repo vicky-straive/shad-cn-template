@@ -3,6 +3,11 @@ import type { NextRequest } from "next/server";
 import { getToken } from "next-auth/jwt";
 
 export async function middleware(request: NextRequest) {
+  // First, check if the request is for Next-Auth API routes
+  if (request.nextUrl.pathname.startsWith("/api/auth")) {
+    return NextResponse.next();
+  }
+
   const token = await getToken({
     req: request,
     secret: process.env.NEXTAUTH_SECRET,
@@ -13,14 +18,14 @@ export async function middleware(request: NextRequest) {
     "/",
     "/auth/signin",
     "/auth/signup",
+    "/auth/signout",
+    "/auth/error",
+    "/auth/verify-request",
     "/auth/forgot-password",
-    "/api/auth",
   ];
 
-  const isPublicPath = publicPaths.some(
-    (path) =>
-      request.nextUrl.pathname.startsWith(path) ||
-      request.nextUrl.pathname.includes("/api/")
+  const isPublicPath = publicPaths.some((path) =>
+    request.nextUrl.pathname.startsWith(path)
   );
 
   // Protected routes check
@@ -44,13 +49,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public (public files)
-     */
-    "/((?!_next/static|_next/image|favicon.ico|public).*)",
+    // Exclude Next-Auth API routes
+    "/((?!api/auth|_next/static|_next/image|favicon.ico|public).*)",
   ],
 };
