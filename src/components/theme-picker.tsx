@@ -26,12 +26,13 @@ export function ThemePicker() {
   const { themeSettings, setThemeSettings } = useThemeSettings();
   const { theme, font, fontSize } = themeSettings;
 
-  const setTheme = (newTheme: string) =>
-    setThemeSettings((prev) => ({ ...prev, theme: newTheme }));
-  const setFont = (newFont: string) =>
-    setThemeSettings((prev) => ({ ...prev, font: newFont }));
+  // / Update these functions:
+  const setTheme = (newTheme: string) => setThemeSettings({ theme: newTheme });
+
+  const setFont = (newFont: string) => setThemeSettings({ font: newFont });
+
   const setFontSize = (newFontSize: number) =>
-    setThemeSettings((prev) => ({ ...prev, fontSize: newFontSize }));
+    setThemeSettings({ fontSize: newFontSize });
   const isMobile = useMobile();
   const [open, setOpen] = useState(false);
 
